@@ -8,33 +8,48 @@ from rcsp import AdvType, HEADER, OpCode, Packet, TYPE_COMMAND, hex_str
 
 # ANC/mode command bytes (Custom opCode 255)
 class ANCMode:
-    NORMAL       = bytes([0x17, 0x03, 0x03, 0x01, 0x04])
-    TRANSPARENCY = bytes([0x17, 0x03, 0x02, 0x00, 0x00])
-    ANC_LOW      = bytes([0x17, 0x03, 0x01, 0x01, 0x00])
-    ANC_MEDIUM   = bytes([0x17, 0x03, 0x01, 0x01, 0x01])
-    ANC_HIGH     = bytes([0x17, 0x03, 0x01, 0x01, 0x02])
+    TRANSPARENCY    = bytes([0x17, 0x03, 0x02, 0x00, 0x00])  # ANC desligado
+    NORMAL          = bytes([0x17, 0x03, 0x03, 0x01, 0x04])  # Transparência (ambiente)
 
-    ALL = [NORMAL, TRANSPARENCY, ANC_LOW, ANC_MEDIUM, ANC_HIGH]
+    NOISY_LOW       = bytes([0x17, 0x03, 0x01, 0x01, 0x00])  # Ruidoso baixo
+    NOISY_MED       = bytes([0x17, 0x03, 0x01, 0x01, 0x01])  # Ruidoso médio
+    NOISY_HIGH      = bytes([0x17, 0x03, 0x01, 0x01, 0x02])  # Ruidoso alto
+
+    COMMUTING_LOW   = bytes([0x17, 0x03, 0x01, 0x02, 0x00])  # Transporte baixo
+    COMMUTING_MED   = bytes([0x17, 0x03, 0x01, 0x02, 0x01])  # Transporte médio
+    COMMUTING_HIGH  = bytes([0x17, 0x03, 0x01, 0x02, 0x02])  # Transporte alto
+
+    INDOOR_LOW      = bytes([0x17, 0x03, 0x01, 0x03, 0x00])  # Interior baixo
+    INDOOR_MED      = bytes([0x17, 0x03, 0x01, 0x03, 0x01])  # Interior médio
+    INDOOR_HIGH     = bytes([0x17, 0x03, 0x01, 0x03, 0x02])  # Interior alto
+
+    ANTIWIND        = bytes([0x17, 0x03, 0x01, 0x04, 0x00])  # Anti-vento
+    ADAPTIVE        = bytes([0x17, 0x03, 0x01, 0x05, 0x00])  # Adaptativo
+
+    ALL = [
+        TRANSPARENCY,
+        NORMAL,
+        NOISY_LOW, NOISY_MED, NOISY_HIGH,
+        ADAPTIVE,
+    ]
 
     @staticmethod
     def from_params(params: bytes) -> int | None:
-        """Decode mode index (0-4) from GET 0x17 response params.
-        Order matches MODE_LABELS: Normal(ANC off), Transparência, ANC Low/Med/High."""
+        """Decode mode index (0-5) from GET 0x17 response params."""
         if len(params) < 5:
             return None
-        sub = params[2]
+        sub   = params[2]
+        group = params[3]
+        level = params[4]
         if sub == 0x02:
-            return 0  # Normal (ANC off)
+            return 0   # ANC Desligado
         if sub == 0x03:
-            return 1  # Transparência (ambient/hear-through)
+            return 1   # Transparência
         if sub == 0x01:
-            val = params[4]
-            if val == 0:
-                return 2  # ANC_LOW
-            if val == 1:
-                return 3  # ANC_MEDIUM
-            if val == 2:
-                return 4  # ANC_HIGH
+            if group == 0x01:
+                return 2 + level   # ANC Low/Med/High → 2,3,4
+            if group == 0x05:
+                return 5           # Adaptativo
         return None
 
 

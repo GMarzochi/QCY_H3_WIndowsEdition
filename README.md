@@ -26,7 +26,7 @@ App desktop para Windows que permite controlar o fone de ouvido **QCY H3** via B
 
 | Recurso | Descrição |
 |---------|-----------|
-| **Modos de ruído** | ANC Desligado, Transparência, ANC Baixo, ANC Médio, ANC Alto |
+| **Modos de ruído** | ANC Desligado, Transparência, ANC Baixo, ANC Médio, ANC Alto, Adaptativo |
 | **Equalizador 10 bandas** | 55 Hz · 220 Hz · 500 Hz · 1 kHz · 1,8 kHz · 2,8 kHz · 4,5 kHz · 7,5 kHz · 10 kHz · 22 kHz |
 | **Presets de EQ** | Custom, Default, Pop, Heavy Bass, Rock, Soft, Classic |
 | **Game Mode** | Ativa modo de baixa latência para jogos |
@@ -159,6 +159,7 @@ params = [0x17, 0x03, sub, group, level]
 | ANC Baixo | `0x01` | `0x01` | `0x00` | ANC Baixo |
 | ANC Médio | `0x01` | `0x01` | `0x01` | ANC Médio |
 | ANC Alto | `0x01` | `0x01` | `0x02` | ANC Alto |
+| Adaptativo | `0x01` | `0x05` | `0x00` | Adaptativo |
 
 Para **ler** o modo atual:
 ```

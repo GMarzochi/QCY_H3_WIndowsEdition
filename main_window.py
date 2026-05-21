@@ -11,10 +11,8 @@ from ble_worker import BleWorker
 from h3_device import ANCMode, EQ_BAND_LABELS, EQ_PRESET_NAMES, EQ_PRESET_IDS, EQ_PRESET_OFFSETS
 
 
-MODE_LABELS = ["ANC Desligado", "Transparência", "ANC Baixo", "ANC Médio", "ANC Alto"]
-# Normal = ANC completamente desligado (sub=02)
-# Transparência = modo ambiente, ouve o som ao redor (sub=03)
-MODE_BYTES  = [ANCMode.TRANSPARENCY, ANCMode.NORMAL, ANCMode.ANC_LOW, ANCMode.ANC_MEDIUM, ANCMode.ANC_HIGH]
+MODE_LABELS = ["ANC Desligado", "Transparência", "ANC Baixo", "ANC Médio", "ANC Alto", "Adaptativo"]
+MODE_BYTES  = ANCMode.ALL
 
 
 # -----------------------------------------------------------------------
@@ -194,8 +192,8 @@ class MainWindow(QMainWindow):
         for i, label in enumerate(MODE_LABELS):
             btn = QPushButton(label)
             btn.setCheckable(True)
-            btn.setMinimumWidth(88)
-            btn.clicked.connect(lambda _, idx=i: self._on_mode_btn(idx))
+            btn.setEnabled(False)
+            btn.clicked.connect(lambda _, idx=i: self._on_mode_changed(idx))
             mode_lay.addWidget(btn)
             self._mode_buttons.append(btn)
         root.addWidget(mode_group)
@@ -327,7 +325,7 @@ class MainWindow(QMainWindow):
     # User actions
     # ------------------------------------------------------------------
 
-    def _on_mode_btn(self, idx: int):
+    def _on_mode_changed(self, idx: int):
         self._set_mode_active(idx)
         self._worker.set_mode(MODE_BYTES[idx])
         self.statusBar().showMessage(f"Modo: {MODE_LABELS[idx]}")
